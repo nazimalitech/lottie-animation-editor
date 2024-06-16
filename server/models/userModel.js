@@ -1,19 +1,10 @@
-const { Pool } = require('pg');
+const pool = require('../server/db');
 const bcrypt = require('bcryptjs');
-
-// PostgreSQL setup
-const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'lottie_animation_editor',
-  password: 'H7n8m6k1r',
-  port: 5432,
-});
 
 const registerUser = async (username, password) => {
   const hashedPassword = await bcrypt.hash(password, 10);
   const res = await pool.query(
-    'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username',
+    'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username, created_at',
     [username, hashedPassword]
   );
   return res.rows[0];

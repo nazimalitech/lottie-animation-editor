@@ -1,13 +1,4 @@
-const { Pool } = require('pg');
-
-// PostgreSQL setup
-const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'lottie_animation_editor',
-  password: 'H7n8m6k1r',
-  port: 5432,
-});
+const pool = require('../server/db');
 
 const getAnimations = async () => {
   const res = await pool.query('SELECT * FROM animations');
@@ -37,7 +28,6 @@ const updateAnimation = async (id, name, data) => {
 
 const deleteAnimation = async (id) => {
   await pool.query('DELETE FROM animations WHERE id = $1', [id]);
-  return { message: 'Animation deleted successfully' };
 };
 
 module.exports = {
