@@ -1,0 +1,18 @@
+.animation-editor {
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.controls {
+  margin-top: 20px;
+}
+
+.controls label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.animation-container {
+  margin-top: 20px;
+}
