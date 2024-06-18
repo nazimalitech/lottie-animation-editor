@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { AnimationEditor, LayerManager, Chat, FeaturedAnimations } from './components';
+import { AnimationEditor, Chat } from './components';
 
 const App: React.FC = () => {
   return (
@@ -10,9 +10,7 @@ const App: React.FC = () => {
       </header>
       <main>
         <AnimationEditor />
-        <LayerManager />
         <Chat />
-        <FeaturedAnimations />
       </main>
     </div>
   );

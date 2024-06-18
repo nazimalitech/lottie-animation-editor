@@ -4,14 +4,12 @@ interface AnimationState {
   speed: number;
   scale: number;
   color: string;
-  animationData: any;
 }
 
 const initialState: AnimationState = {
   speed: 1,
   scale: 1,
   color: '#000000',
-  animationData: null,
 };
 
 const animationSlice = createSlice({
@@ -27,12 +25,9 @@ const animationSlice = createSlice({
     setColor: (state, action: PayloadAction<string>) => {
       state.color = action.payload;
     },
-    setAnimationData: (state, action: PayloadAction<any>) => {
-      state.animationData = action.payload;
-    },
   },
 });
 
-export const { setSpeed, setScale, setColor, setAnimationData } = animationSlice.actions;
+export const { setSpeed, setScale, setColor } = animationSlice.actions;
 
 export default animationSlice.reducer;

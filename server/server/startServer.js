@@ -53,6 +53,20 @@ const startServer = async () => {
       console.log(`Update in room ${roomId}:`, updateData);
     });
 
+    // Listen for animation property changes
+    socket.on('updateAnimationProperties', (data) => {
+      const { roomId, properties } = data;
+      socket.to(roomId).emit('updateAnimationProperties', properties);
+      console.log(`Animation properties updated in room ${roomId}:`, properties);
+    });
+
+    // Listen for layer management changes
+    socket.on('updateLayerManagement', (data) => {
+      const { roomId, layers } = data;
+      socket.to(roomId).emit('updateLayerManagement', layers);
+      console.log(`Layer management updated in room ${roomId}:`, layers);
+    });
+
     socket.on('disconnect', () => {
       console.log('user disconnected');
     });

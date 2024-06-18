@@ -1,11 +1,41 @@
 import React from 'react';
-import './FeaturedAnimations.css';
+import { useQuery, gql } from '@apollo/client';
+import client from '../apolloClient';
 
-const FeaturedAnimations: React.FC = () => {
+const GET_FEATURED_ANIMATIONS = gql`
+  query GetFeaturedAnimations {
+    featuredAnimations {
+      id
+      title
+      preview_url
+    }
+  }
+`;
+
+interface FeaturedAnimationsProps {
+  onImport: (animationUrl: string) => void;
+}
+
+const FeaturedAnimations: React.FC<FeaturedAnimationsProps> = ({ onImport }) => {
+  const { loading, error, data } = useQuery(GET_FEATURED_ANIMATIONS, { client });
+
   return (
-    <div className="featured-animations">
-      <h2>Featured Animations</h2>
-      {/* Featured animations content will go here */}
+    <div>
+      <h3>Featured Animations</h3>
+      {loading && <p>Loading...</p>}
+      {error && <p>Error fetching featured animations.</p>}
+      {data && (
+        <div className="featured-animations">
+          {data.featuredAnimations.map((animation: any) => (
+            <div key={animation.id} className="featured-animation">
+              <h4>{animation.title}</h4>
+              <button onClick={() => onImport(animation.preview_url)}>
+                Import
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

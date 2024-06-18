@@ -4,6 +4,9 @@ import { SketchPicker } from 'react-color';
 import Lottie, { LottieRefCurrentProps } from 'lottie-react';
 import { setSpeed, setScale, setColor } from '../redux/slices/animationSlice';
 import { RootState } from '../redux/store';
+import LayerManager from './LayerManager';
+import FeaturedAnimations from './FeaturedAnimations';
+import socket from '../socket';
 import './AnimationEditor.css';
 
 const AnimationEditor: React.FC = () => {
@@ -13,6 +16,43 @@ const AnimationEditor: React.FC = () => {
   const speed = useSelector((state: RootState) => state.animation.speed);
   const scale = useSelector((state: RootState) => state.animation.scale);
   const color = useSelector((state: RootState) => state.animation.color);
+  const roomId = '1234';
+
+  useEffect(() => {
+    socket.connect();
+
+    socket.emit('join', roomId);
+
+    socket.on('update', (updateData) => {
+      setAnimationData((prevData: any) => ({
+        ...prevData,
+        ...updateData,
+      }));
+    });
+
+    return () => {
+      socket.emit('leave', roomId);
+      socket.disconnect();
+    };
+  }, [roomId]);
+
+  useEffect(() => {
+    socket.on('updateAnimationProperties', (properties) => {
+      if (properties.speed !== undefined) {
+        dispatch(setSpeed(properties.speed));
+      }
+      if (properties.scale !== undefined) {
+        dispatch(setScale(properties.scale));
+      }
+      if (properties.color !== undefined) {
+        dispatch(setColor(properties.color));
+      }
+    });
+
+    return () => {
+      socket.off('updateAnimationProperties');
+    };
+  }, [dispatch]);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -22,6 +62,7 @@ const AnimationEditor: React.FC = () => {
         try {
           const json = JSON.parse(e.target?.result as string);
           setAnimationData(json);
+          socket.emit('update', { roomId, updateData: json });
         } catch (error) {
           console.error('Error parsing JSON:', error);
         }
@@ -33,16 +74,19 @@ const AnimationEditor: React.FC = () => {
   const handleSpeedChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newSpeed = parseFloat(event.target.value);
     dispatch(setSpeed(newSpeed));
+    socket.emit('updateAnimationProperties', { roomId, properties: { speed: newSpeed } });
   };
 
   const handleScaleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newScale = parseFloat(event.target.value);
     dispatch(setScale(newScale));
+    socket.emit('updateAnimationProperties', { roomId, properties: { scale: newScale } });
   };
 
   const handleColorChange = (color: any) => {
     const newColor = color.hex;
     dispatch(setColor(newColor));
+    socket.emit('updateAnimationProperties', { roomId, properties: { color: newColor } });
     if (animationData) {
       const newAnimationData = { ...animationData };
       newAnimationData.layers.forEach((layer: any) => {
@@ -64,6 +108,17 @@ const AnimationEditor: React.FC = () => {
         }
       });
       setAnimationData(newAnimationData);
+    }
+  };
+
+  const handleImportAnimation = async (animationUrl: string) => {
+    try {
+      const response = await fetch(animationUrl);
+      const json = await response.json();
+      setAnimationData(json);
+      socket.emit('update', { roomId, updateData: json });
+    } catch (error) {
+      console.error('Error importing animation:', error);
     }
   };
 
@@ -115,8 +170,16 @@ const AnimationEditor: React.FC = () => {
               style={{ transform: `scale(${scale})` }}
             />
           </div>
+          <LayerManager
+            animationData={animationData}
+            setAnimationData={setAnimationData}
+            roomId={roomId}
+          />
         </>
       )}
+      <FeaturedAnimations
+        onImport={handleImportAnimation}
+      />
     </div>
   );
 };
