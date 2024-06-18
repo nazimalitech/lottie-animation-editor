@@ -12,7 +12,7 @@ const startServer = async () => {
   const app = express();
 
   // Middleware
-  app.use(cors());
+  app.use(cors({ origin: 'http://localhost:3000' }));
   app.use(bodyParser.json());
 
   // GraphQL setup
@@ -22,7 +22,13 @@ const startServer = async () => {
 
   // Socket.IO setup
   const httpServer = http.createServer(app);
-  const io = socketIo(httpServer);
+  const io = socketIo(httpServer, {
+    cors: {
+      origin: 'http://localhost:3000',
+      methods: ['GET', 'POST'],
+      credentials: true,
+    },
+  });
 
   // Handle connection events
   io.on('connection', (socket) => {
