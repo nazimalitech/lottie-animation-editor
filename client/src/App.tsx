@@ -1,18 +1,17 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import User from './components/User';
 import './App.css';
-import { AnimationEditor, Chat } from './components';
+import { Home } from './components';
 
 const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Lottie Animation Editor</h1>
-      </header>
-      <main>
-        <AnimationEditor />
-        <Chat />
-      </main>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<User />} />
+        <Route path="/home" element={<Home />} />
+      </Routes>
+    </Router>
   );
 };
 

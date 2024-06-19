@@ -10,9 +10,10 @@ const bodyParser = require('body-parser');
 const startServer = async () => {
   // Initialize Express app
   const app = express();
+  const WEB_APP_URL = process.env.WEB_APP_URL || 'http://localhost:3000';
 
   // Middleware
-  app.use(cors({ origin: 'http://localhost:3000' }));
+  app.use(cors({ origin: WEB_APP_URL }));
   app.use(bodyParser.json());
 
   // GraphQL setup
@@ -24,7 +25,7 @@ const startServer = async () => {
   const httpServer = http.createServer(app);
   const io = socketIo(httpServer, {
     cors: {
-      origin: 'http://localhost:3000',
+      origin: WEB_APP_URL,
       methods: ['GET', 'POST'],
       credentials: true,
     },
@@ -67,6 +68,11 @@ const startServer = async () => {
       console.log(`Layer management updated in room ${roomId}:`, layers);
     });
 
+    // Listen for chat messages
+    socket.on('chatMessage', (msg) => {
+      io.emit('chatMessage', msg);
+    });
+
     socket.on('disconnect', () => {
       console.log('user disconnected');
     });
@@ -74,7 +80,7 @@ const startServer = async () => {
 
   // Routes
   const authRoutes = require('../routes/authRoutes');
-  app.use('/auth', authRoutes);
+  app.use('/api/auth', authRoutes);
 
   // Start the server
   const PORT = process.env.PORT || 4000;
