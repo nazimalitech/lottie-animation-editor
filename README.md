@@ -11,6 +11,11 @@ This project is a real-time animation editor that allows users to create and edi
 - Secure JWT authentication
 - User Registration and Login
 - Real-time chat feature
+- Socket.IO for real-time updates
+
+## Live Demo
+
+Check out the live demo of the project [here](https://animation-editor-vuxn.onrender.com).
 
 ## Technologies Used
 
